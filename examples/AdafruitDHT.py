@@ -33,10 +33,10 @@ def post_to_mcs(payload):
 	not_connected = 1 
 	while (not_connected):
 		try:
-			conn = http.client.HTTPConnection("api.mediatek.com:80")
+			conn = httplib.HTTPConnection("api.mediatek.com:80")
 			conn.connect() 
 			not_connected = 0 
-		except (http.client.HTTPException, socket.error) as ex: 
+		except (httplib.HTTPException, socket.error) as ex: 
 			print ("Error: %s")
  			time.sleep(10)
 			 # sleep 10 seconds 
@@ -71,7 +71,13 @@ else:
 while True:
 	h0, t0 = Adafruit_DHT.read_retry(sensor, pin)
 	if h0 is not None and t0 is not None:
-		print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
+		print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(t0, h0))
+	
+		payload = {"datapoints":[{"dataChnId":"Humidity","values":{"value":h0}},
+		{"dataChnId":"Temperature","values":{"value":t0}}]} 
+		post_to_mcs(payload)
+		time.sleep(10) 
+	
 	else:
 		print('Failed to get reading. Try again!')
 		sys.exit(1)
